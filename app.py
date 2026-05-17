@@ -6,6 +6,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import os
+import pickle
 
 # Initialize Dash App with a Slate/Dark Bootstrap theme
 app = dash.Dash(
@@ -16,6 +17,14 @@ app = dash.Dash(
 )
 
 server = app.server
+
+# Load ML model
+model_path = os.path.join(r"c:\Users\hpvic\OneDrive\Documents\Finance of Robotaxi", "models", "churn_classifier.pkl")
+if os.path.exists(model_path):
+    with open(model_path, 'rb') as f:
+        churn_model = pickle.load(f)
+else:
+    churn_model = None
 
 # Load cleaned data
 cleaned_dir = r"c:\Users\hpvic\OneDrive\Documents\Finance of Robotaxi\cleaned_data"
@@ -353,7 +362,141 @@ def render_customers_page():
                     dcc.Graph(figure=fig_c2)
                 ], className="glass-card")
             ], width=6)
-        ])
+        ]),
+        
+        # Row 2: AI Churn Predictor Form
+        html.Div([
+            html.H4("🔮 Prediksi Churn Pelanggan dengan AI (Random Forest)", style={'fontWeight': 'bold', 'color': '#60a5fa', 'marginBottom': '20px'}),
+            
+            dbc.Row([
+                # Col 1: Profil Keanggotaan
+                dbc.Col([
+                    html.Label("Loyalty Tier", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-loyalty",
+                        options=[{"label": x, "value": x} for x in ["Bronze", "Silver", "Gold", "Platinum", "Diamond"]],
+                        value="Silver",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                    
+                    html.Label("Subscription Plan", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-sub",
+                        options=[{"label": x, "value": x} for x in ["Free", "Standard", "Premium"]],
+                        value="Standard",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                    
+                    html.Label("Preferred Payment", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-payment",
+                        options=[{"label": x, "value": x} for x in ["Credit Card", "PayPal", "Mobile Wallet", "Cash"]],
+                        value="Credit Card",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                ], width=3),
+                
+                # Col 2: Status & Referral
+                dbc.Col([
+                    html.Label("Account Status", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-status",
+                        options=[{"label": x, "value": x} for x in ["Active", "Suspended", "Inactive"]],
+                        value="Active",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                    
+                    html.Label("Referral Source", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-referral",
+                        options=[{"label": x, "value": x} for x in ["Google Ads", "Friend Referral", "Organic", "Social Media"]],
+                        value="Google Ads",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                    
+                    html.Label("Age Group", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-age",
+                        options=[{"label": x, "value": x} for x in ["18-24", "25-34", "35-44", "45-54", "55-64", "65+"]],
+                        value="35-44",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                ], width=3),
+                
+                # Col 3: Geodemografi & Promo
+                dbc.Col([
+                    html.Label("Gender", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-gender",
+                        options=[{"label": x, "value": x} for x in ["Female", "Male", "Non-binary"]],
+                        value="Female",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                    
+                    html.Label("City", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-city",
+                        options=[{"label": x, "value": x} for x in ["San Francisco", "Miami", "New York", "Seattle", "Los Angeles"]],
+                        value="San Francisco",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                    
+                    html.Label("Promo Eligible Flag", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Select(
+                        id="churn-promo",
+                        options=[{"label": "Yes", "value": "1"}, {"label": "No", "value": "0"}],
+                        value="1",
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                ], width=3),
+                
+                # Col 4: Keaktifan & Durasi
+                dbc.Col([
+                    html.Label("Total Trips", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Input(
+                        id="churn-trips", type="number", value=150, min=0, max=1000,
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                    
+                    html.Label("Total Spent ($)", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Input(
+                        id="churn-spent", type="number", value=250.0, min=0.0, max=10000.0,
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                    
+                    html.Label("Customer Lifetime Value ($)", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Input(
+                        id="churn-ltv", type="number", value=500.0, min=0.0, max=50000.0,
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                ], width=3),
+            ]),
+            
+            dbc.Row([
+                dbc.Col([
+                    html.Label("Days Since Joined (Umur Keanggotaan)", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold'}),
+                    dbc.Input(
+                        id="churn-joined", type="number", value=365, min=1, max=2000,
+                        style={'backgroundColor': '#0f172a', 'borderColor': '#1e293b', 'color': '#e2e8f0', 'marginBottom': '15px'}
+                    ),
+                ], width=4),
+                dbc.Col([
+                    html.Label("Average Rating Given (Skor Rating Diberikan)", style={'fontSize': '12px', 'color': '#94a3b8', 'fontWeight': 'bold', 'marginBottom': '10px'}),
+                    dcc.Slider(
+                        id="churn-rating", min=1.0, max=5.0, step=0.1, value=4.0,
+                        marks={i: str(i) for i in range(1, 6)},
+                        className="custom-slider"
+                    )
+                ], width=8, style={'paddingTop': '5px'})
+            ], style={'marginBottom': '25px'}),
+            
+            # Live Output Alert Box
+            html.Div(id='churn-prediction-result-box', className="safe-badge", children=[
+                html.H5("🤖 AI Prediction Status", style={'fontWeight': 'bold', 'margin': '0 0 5px 0'}),
+                html.Div(id='churn-prediction-text', style={'fontSize': '15px', 'fontWeight': '600'})
+            ], style={'marginTop': '15px'})
+            
+        ], className="glass-card")
     ])
 
 
@@ -449,6 +592,63 @@ def update_simulator(discount_pct):
     saved_amount = annual_insurance_premium * (discount_pct / 100.0)
     new_premium = annual_insurance_premium - saved_amount
     return f"${saved_amount:,.2f}", f"${new_premium:,.2f}"
+
+
+# Callback for AI Customer Churn Prediction
+@app.callback(
+    [
+        Output('churn-prediction-text', 'children'),
+        Output('churn-prediction-result-box', 'className')
+    ],
+    [
+        Input('churn-loyalty', 'value'),
+        Input('churn-sub', 'value'),
+        Input('churn-payment', 'value'),
+        Input('churn-status', 'value'),
+        Input('churn-referral', 'value'),
+        Input('churn-age', 'value'),
+        Input('churn-gender', 'value'),
+        Input('churn-city', 'value'),
+        Input('churn-trips', 'value'),
+        Input('churn-spent', 'value'),
+        Input('churn-rating', 'value'),
+        Input('churn-ltv', 'value'),
+        Input('churn-promo', 'value'),
+        Input('churn-joined', 'value'),
+    ]
+)
+def update_churn_prediction(loyalty, sub, payment, status, referral, age, gender, city, trips, spent, rating, ltv, promo, joined):
+    if churn_model is None:
+        return "Model ML belum dimuat. Silakan latih model terlebih dahulu.", "leak-badge"
+        
+    # Construct input dataframe
+    input_df = pd.DataFrame([{
+        'loyalty_tier': loyalty,
+        'subscription_plan': sub,
+        'preferred_payment': payment,
+        'account_status': status,
+        'referral_source': referral,
+        'age_group': age,
+        'gender': gender,
+        'city': city,
+        'total_trips': int(trips) if trips is not None else 0,
+        'total_spent_usd': float(spent) if spent is not None else 0.0,
+        'avg_rating_given': float(rating) if rating is not None else 0.0,
+        'lifetime_value_usd': float(ltv) if ltv is not None else 0.0,
+        'promo_eligible_flag': int(promo) if promo is not None else 0,
+        'days_since_joined': int(joined) if joined is not None else 0
+    }])
+    
+    try:
+        pred = churn_model.predict(input_df)[0]
+        prob = churn_model.predict_proba(input_df)[0][1]
+        
+        if pred == 1:
+            return f"⚠️ RISIKO CHURN TINGGI (Probabilitas Churn: {prob:.1%}). Pelanggan berisiko tinggi pergi! Segera berikan promo penawaran khusus.", "leak-badge"
+        else:
+            return f"✅ RISIKO CHURN RENDAH (Probabilitas Churn: {prob:.1%}). Pelanggan aktif, loyal, dan cenderung bertahan.", "safe-badge"
+    except Exception as e:
+        return f"Error saat melakukan prediksi: {str(e)}", "leak-badge"
 
 
 if __name__ == '__main__':

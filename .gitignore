@@ -1,65 +1,24 @@
-# Data files (Exclude large raw and cleaned datasets from Git)
+# =======================================================================
+# 🚕 Robotaxi Finance Analytics - Standard .gitignore
+# =======================================================================
+
+# 📊 Large Data Files (Ignore all CSV/Excel data to avoid GitHub size limit issues)
 *.csv
 *.xlsx
 cleaned_data/
 
-# Model files (Exclude large binary models from Git)
+# 🤖 Machine Learning Model Artifacts (Serialized binary weights)
 models/
 *.pkl
 *.joblib
 *.pb
 *.h5
 
-# Byte-compiled / optimized / DLL files
+# 🐍 Python Virtual Environments & Cache Directories
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nosenv/
-.gcov/
-.lcov/
-metadata.db
-databases/
-.pytest_cache/
-cover/
-
-# Jupyter Notebook
-.ipynb_checkpoints
-*/.ipynb_checkpoints/*
-
-# Environments
 .env
 .venv
 env/
@@ -68,13 +27,17 @@ ENV/
 env.bak/
 venv.bak/
 
-# macOS files
-.DS_Store
+# 📓 Jupyter Notebook State Checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
 
-# Temporary / OS generated
+# ⚙️ OS & Editor Temporary Files
+.DS_Store
 Thumby.db
 ehthumbs.db
 desktop.ini
+.vscode/
+.idea/
 
-# Antigravity agent temp folder
+# 🤖 Agent-Specific Temporal Folders
 .gemini/

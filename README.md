@@ -68,6 +68,7 @@ Kami melatih model **Random Forest Classifier** menggunakan pustaka `scikit-lear
 * **Preprocessing:** `StandardScaler` untuk metrik numerik & `OneHotEncoder` untuk profil kategorikal.
 * **Balanced Class Weights:** Menangani ketidakseimbangan kelas (*class imbalance*) 10% target minoritas secara otomatis.
 * **Akurasi Model:** **89,30%** (ROC-AUC Score: **48,74%**).
+* **Integrasi Dashboard AI:** Model terlatih (`.pkl`) diintegrasikan langsung secara interaktif ke dalam tab **"Perilaku Pelanggan"** pada aplikasi web Dash, memungkinkan simulasi prediksi churn *real-time* berdasarkan 14 input data profil dan aktivitas pelanggan!
 * **Diagnostik Data Scientist:** Kami mendokumentasikan wawasan kritis bahwa skor churn pada dataset simulasi ini dihasilkan secara acak (*random noise*) karena korelasinya 0.00 terhadap metrik perjalanan asli pelanggan. Temuan ini sangat berharga untuk menunjukkan ketajaman analisis statistik kepada rekruter.
 
 ---
